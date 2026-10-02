@@ -1,32 +1,50 @@
-import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Optional;
 
+import CustomTypes.CustomList;
+
+/** Verwaltet Fahrzeuge und bietet grundlegende Fuhrparkoperationen an. */
 public class Fuhrpark {
-    private ArrayList<Fahrzeug> meine_autos;
-    private int fahrzeugAnzahl;
+    private final CustomList<Fahrzeug> fahrzeuge = new CustomList<Fahrzeug>();
 
-    public Fuhrpark() {
-        this.fahrzeugAnzahl = 0;
-        this.meine_autos = new ArrayList<Fahrzeug>();
+    /** Fügt ein Fahrzeug am Ende des Fuhrparks hinzu. */
+    public void fuegeFahrzeugHinzu(Fahrzeug fahrzeug) {
+        fahrzeuge.append(
+                Objects.requireNonNull(fahrzeug, "Das Fahrzeug darf nicht null sein."));
     }
 
-    public void addCar(Fahrzeug car) {
-        this.fahrzeugAnzahl += 1;
-        meine_autos.add(car);
+    /** Entfernt das übergebene Fahrzeug und meldet, ob es im Fuhrpark enthalten war. */
+    public boolean entferneFahrzeug(Fahrzeug fahrzeug) {
+        Fahrzeug zuEntfernendesFahrzeug = Objects.requireNonNull(
+                fahrzeug,
+                "Das Fahrzeug darf nicht null sein.");
+        return fahrzeuge.remove(zuEntfernendesFahrzeug);
     }
 
-    public void delCar(Fahrzeug car) {
-        this.fahrzeugAnzahl -= 1;
-        meine_autos.remove(car);
-    }
+    /** Sucht ohne Beachtung der Groß- und Kleinschreibung nach einem Kennzeichen. */
+    public Optional<Fahrzeug> sucheNachKennzeichen(String kennzeichen) {
+        String gesuchtesKennzeichen = Objects.requireNonNull(
+                kennzeichen,
+                "Das Kennzeichen darf nicht null sein.").trim();
 
-    public Fahrzeug getCar(String kennzeichen) {
-        for (Fahrzeug f: meine_autos) {
-            if (f.getInfo("kz").equals(kennzeichen)) {
-                return f;
-            } else {
-                IO.println("Fahrzeug nicht gefunden!");
+        for (Fahrzeug fahrzeug : fahrzeuge) {
+            if (fahrzeug.getKennzeichen().equalsIgnoreCase(gesuchtesKennzeichen)) {
+                return Optional.of(fahrzeug);
             }
         }
-        return null;
+
+        return Optional.empty();
+    }
+
+    /** Gibt die aktuelle Anzahl der Fahrzeuge zurück. */
+    public int getAnzahlFahrzeuge() {
+        return fahrzeuge.size();
+    }
+
+    /**
+     * Gibt eine unabhängige Liste zurück; die enthaltenen Fahrzeuge bleiben dieselben Objekte.
+     */
+    public CustomList<Fahrzeug> getFahrzeuge() {
+        return fahrzeuge.copy();
     }
 }
